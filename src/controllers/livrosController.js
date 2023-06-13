@@ -7,11 +7,22 @@ class LivroController {
         })
     }
 
+    static getLivroId = (req, res) => {
+        const {id} = req.params;
+        livros.findById(id, (err, livros) => {
+            if(!err) {
+                res.status(200).send(livros);
+            } else {
+                res.status(400).send({message: ` ${err} - ${id} não encontrado`});
+            }
+        })
+    }
+
     static postLivro = (req, res) => {
         let livro = new livros(req.body)
         livro.save((err) => {
             if(err) {
-                res.status(500).send({message: `${err.message} - Falha ao cadastrar livro`})
+                res.status(500).send({message: `${err.message} - Falha ao cadastrar livro`});
             } else {
                 res.status(201).send(livro.toJSON()); 
             }
@@ -23,12 +34,24 @@ class LivroController {
 
         livros.findByIdAndUpdate(id, {$set: req.body}, (err) => {
             if(!err) {
-                res.status(200).send({message: "Livro atualizad com sucesso!"})
+                res.status(200).send({message: "Livro atualizado com sucesso!"});
             } else {
-                res.status(500).send({message: err.message})
+                res.status(500).send({message: err.message});
             }
         })
+    }
 
+    static deleteLivro = (req, res) => {
+        const {id} = req.params;
+
+        livros.findByIdAndDelete(id, (err) => {
+            if(!err) {
+                res.status(200).send("Livro excluído com sucesso!!!");
+            } else {
+                res.status(500).send({message: `${err.message}`})
+                console.log(id)
+            }
+        })
     }
 }
 
