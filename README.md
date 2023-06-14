@@ -23,6 +23,11 @@
 :small_blue_diamond: [Como rodar a aplicação](#como-rodar-a-aplicação-arrow_forward)
 
 ... 
+<div align="center">
+  <img src="https://github.com/klaercio/NODE_APIREST_EXPRESS_MONGODB/assets/75287995/dea0205c-b06b-4d6d-ac0e-9be99ee47fa4"/>
+  <img src="https://github.com/klaercio/NODE_APIREST_EXPRESS_MONGODB/assets/75287995/048653b1-52a5-4953-a87d-ba0cabf54020"/>
+</div>
+
 
 ## Descrição do projeto 
 
