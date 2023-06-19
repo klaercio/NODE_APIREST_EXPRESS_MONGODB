@@ -1,78 +1,68 @@
 import livros from "../models/livro.js";
 
 class LivroController {
-    static getLivros = (req, res) => {
-        livros.find()
-            .populate("autor")
-            .exec((err, livros) => {
-                if(!err)
-                    res.status(200).json(livros);
-                else {
-                    res.status(500).send({message: `${err.message} - Erro no get livros`});
-                }
-            });
+    static getLivros = async (req, res) => {
+        try {
+            const livrosResultado = await livros.find().populate("autor");
+            res.status(200).json(livrosResultado);
+        }catch(err) {
+            res.status(500).send({message: `${err.message} - Erro no get livros`});
+        }
     };
 
     static getLivroId = (req, res) => {
         const {id} = req.params;
-        livros.findById(id)
-            .populate("autor", "nome")
-            .exec((err, livros) => {
-                if(!err) {
-                    res.status(200).send(livros);
-                } else {
-                    res.status(400).send({message: ` ${err} - ${id} não encontrado`});
-                }
-            });
+
+        try {
+            const livrosResultados = livros.findById(id)   .populate("autor", "nome");
+            res.status(200).send(livrosResultados);
+        }catch(err) {
+            res.status(400).send({message: ` ${err} - ${id} não encontrado`});
+        }
     };
 
-    static getLivrosByEditora = (req, res) => {
-        const editora = req.query.editora;
+    static getLivrosByEditora = async (req, res) => {
+        const {editora} = req.query;
 
-        livros.find({"editora": editora})
-            .populate("autor")
-            .exec((err, livros) => {
-                if(!err)
-                    res.status(200).json(livros);
-                else
-                    res.status(400).send({message: err.message});
-            });
+        try {
+            const livrosResultados = await livros.find({"editora": editora}).populate("autor");
+            res.status(200).json(livrosResultados);
+        }catch(err) {
+            res.status(400).send({message: err.message});
+        }
     };
 
-    static postLivro = (req, res) => {
+    static postLivro = async (req, res) => {
         let livro = new livros(req.body);
-        livro.save((err) => {
-            if(err) {
-                res.status(500).send({message: `${err.message} - Falha ao cadastrar livro`});
-            } else {
-                res.status(201).send(livro.toJSON()); 
-            }
-        });
+
+        try {
+            await livro.save();
+            res.status(201).send(livro.toJSON()); 
+        }catch(err) {
+            res.status(500).send({message: `${err.message} - Falha ao cadastrar livro`});
+        }
     };
 
-    static putLivro = (req, res) => {
-        const id = req.params.id;
-
-        livros.findByIdAndUpdate(id, {$set: req.body}, (err) => {
-            if(!err) {
-                res.status(200).send({message: "Livro atualizado com sucesso!"});
-            } else {
-                res.status(500).send({message: err.message});
-            }
-        });
-    };
-
-    static deleteLivro = (req, res) => {
+    static putLivro = async (req, res) => {
         const {id} = req.params;
 
-        livros.findByIdAndDelete(id, (err) => {
-            if(!err) {
-                res.status(200).send("Livro excluído com sucesso!!!");
-            } else {
-                res.status(500).send({message: `${err.message}`});
-                console.log(id);
-            }
-        });
+        try {
+            await livros.findByIdAndUpdate(id, {$set: req.body});
+            res.status(200).send({message: "Livro atualizado com sucesso!"});
+        }catch(err) {
+            res.status(500).send({message: err.message});
+        }
+    };
+
+    static deleteLivro = async (req, res) => {
+        const {id} = req.params;
+
+        try {
+            livros.findByIdAndDelete(id);
+            res.status(200).send("Livro excluído com sucesso!!!");
+        }catch(err) {
+            res.status(500).send({message: `${err.message}`});
+        }
     };
 }
 
