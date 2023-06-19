@@ -10,11 +10,11 @@ class LivroController {
         }
     };
 
-    static getLivroId = (req, res) => {
+    static getLivroId = async (req, res) => {
         const {id} = req.params;
 
         try {
-            const livrosResultados = livros.findById(id)   .populate("autor", "nome");
+            const livrosResultados = await livros.findById(id)   .populate("autor", "nome");
             res.status(200).send(livrosResultados);
         }catch(err) {
             res.status(400).send({message: ` ${err} - ${id} não encontrado`});
@@ -58,7 +58,7 @@ class LivroController {
         const {id} = req.params;
 
         try {
-            livros.findByIdAndDelete(id);
+            await livros.findByIdAndDelete(id);
             res.status(200).send("Livro excluído com sucesso!!!");
         }catch(err) {
             res.status(500).send({message: `${err.message}`});
