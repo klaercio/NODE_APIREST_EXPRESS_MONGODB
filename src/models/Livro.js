@@ -4,12 +4,12 @@ const livroSchema = new mongoose.Schema(
     {
         id: {type: String},
         title: {type: String, required: true},
-        autor: {type: mongoose.Schema.Types.ObjectId, ref: 'autores', required: true},
+        autor: {type: mongoose.Schema.Types.Array, ref: "autores", required: true},
         editora: {type: String, required: true},
         numPag: {type: Number},
     }
 );
 
-const livros = mongoose.model('Livros', livroSchema);
+const livros = mongoose.model("Livros", livroSchema);
 
 export default livros;

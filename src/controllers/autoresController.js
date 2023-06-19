@@ -1,11 +1,14 @@
 import autores from "../models/Autor.js";
 
 class AutorController {
-    static getAutores = (req, res) => {
-        autores.find((err, autores) => {
-            res.status(200).json(autores);
-        })
-    }
+    static getAutores = async (req, res) => {
+        try {
+            const autoresResultado =  await autores.find();
+            res.status(200).json(autoresResultado);
+        }catch(err) {
+            res.status(500).send({message: `${err.message} - Erro no getAutores`});
+        }
+    };
 
     static getAutorId = (req, res) => {
         const {id} = req.params;
@@ -15,19 +18,19 @@ class AutorController {
             } else {
                 res.status(400).send({message: ` ${err} - ${id} não encontrado`});
             }
-        })
-    }
+        });
+    };
 
     static postAutor = (req, res) => {
-        let autor = new autores(req.body)
+        let autor = new autores(req.body);
         autor.save((err) => {
             if(err) {
                 res.status(500).send({message: `${err.message} - Falha ao cadastrar livro`});
             } else {
                 res.status(201).send(autor.toJSON()); 
             }
-        })
-    }
+        });
+    };
 
     static putAutor = (req, res) => {
         const id = req.params.id;
@@ -38,8 +41,8 @@ class AutorController {
             } else {
                 res.status(500).send({message: err.message});
             }
-        })
-    }
+        });
+    };
 
     static deleteAutor = (req, res) => {
         const {id} = req.params;
@@ -48,11 +51,11 @@ class AutorController {
             if(!err) {
                 res.status(200).send("Autor excluído com sucesso!!!");
             } else {
-                res.status(500).send({message: `${err.message}`})
-                console.log(id)
+                res.status(500).send({message: `${err.message}`});
+                console.log(id);
             }
-        })
-    }
+        });
+    };
 }
 
 export default AutorController;
