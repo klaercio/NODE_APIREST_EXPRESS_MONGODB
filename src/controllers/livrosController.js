@@ -1,4 +1,5 @@
-import livros from "../models/livro.js";
+import NaoEncontrado from "../erros/NaoEncontrado.js";
+import livros from "../models/Livro.js";
 
 class LivroController {
     static getLivros = async (req, res, next) => {
@@ -14,8 +15,8 @@ class LivroController {
         const {id} = req.params;
 
         try {
-            const livrosResultados = await livros.findById(id)   .populate("autor", "nome");
-            res.status(200).send(livrosResultados);
+            const livrosResultados = await livros.findById(id).populate("autor", "nome");
+            livrosResultados? res.status(200).send(livrosResultados): next(new NaoEncontrado("Id do livro não localizado"));
         }catch(err) {
             next(err);
         }
@@ -47,8 +48,8 @@ class LivroController {
         const {id} = req.params;
 
         try {
-            await livros.findByIdAndUpdate(id, {$set: req.body});
-            res.status(200).send({message: "Livro atualizado com sucesso!"});
+            const livroResultado = await livros.findByIdAndUpdate(id, {$set: req.body});
+            livroResultado? res.status(200).send({message: "Livro atualizado com sucesso!"}): next(new NaoEncontrado("Id do livro não encontrado"));
         }catch(err) {
             next(err);
         }
@@ -58,8 +59,8 @@ class LivroController {
         const {id} = req.params;
 
         try {
-            await livros.findByIdAndDelete(id);
-            res.status(200).send("Livro excluído com sucesso!!!");
+            const livroResultado = await livros.findByIdAndDelete(id);
+            livroResultado? res.status(200).send({message: "Livro excluído com sucesso!"}): next(new NaoEncontrado("Id do livro não encontrado"));
         }catch(err) {
             next(err);
         }
