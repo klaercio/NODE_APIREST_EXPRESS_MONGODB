@@ -22,11 +22,15 @@ class LivroController {
         }
     };
 
-    static getLivrosByEditora = async (req, res, next) => {
-        const {editora} = req.query;
+    static getLivrosByFilter = async (req, res, next) => {
+        const {editora, title} = req.query;
+
+        const busca = {};
+        if(editora) {busca.editora = editora;}
+        if(title) {busca.title = editora;}
 
         try {
-            const livrosResultados = await livros.find({"editora": editora}).populate("autor");
+            const livrosResultados = await livros.find(busca).populate("autor");
             res.status(200).json(livrosResultados);
         }catch(err) {
             next(err);
