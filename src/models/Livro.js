@@ -8,7 +8,7 @@ const livroSchema = new mongoose.Schema(
             required: [true, "Campo titulo é obrigatório"]
         },
         autor: {
-            type: mongoose.Schema.Types.Array,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "autores",
             required: [true, "Campo autor é obrigatório"]
         },
