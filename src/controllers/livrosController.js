@@ -1,11 +1,26 @@
 import NaoEncontrado from "../erros/NaoEncontrado.js";
+import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 import {autores, livros} from "../models/index.js";
 
 class LivroController {
     static getLivros = async (req, res, next) => {
         try {
-            const livrosResultado = await livros.find().populate("autor");
-            res.status(200).json(livrosResultado);
+
+            const {limite = 1, pagina = 1, ordenacao = "title:1"} = req.query;
+
+            let [campoOrdenacao, ordem] = ordenacao.split(":");
+
+            const livrosResultado = await livros.find()
+                .sort({[campoOrdenacao]: ordem})
+                .skip((pagina-1) * limite)
+                .limit(limite)
+                .populate("autor");
+
+            if (limite < 1 || pagina < 1)  {
+                next(new RequisicaoIncorreta());
+            } else {
+                res.status(200).json(livrosResultado);
+            }
         }catch(err) {
             next(err);
         }
@@ -25,20 +40,27 @@ class LivroController {
     static getLivrosByFilter = async (req, res, next) => {
         const {editora, title, minPag, maxPag, nomeAutor} = req.query;
 
-        const busca = {};
-        if(editora) busca.editora = editora;
-        if(title) busca.title = { $regex: title, $options: "i"};
-        if(maxPag) busca.numPag = { ...busca.numPag, $lte: maxPag};
-        if(minPag) busca.numPag = { ...busca.numPag, $gte: minPag};
-        if(nomeAutor) {
-            const autor = await autores.findOne({ nome: nomeAutor});
-            const autorId = autor._id;
-            busca.autor = autorId;
-        }
-
         try {
+            let busca = {};
+            if(editora) busca.editora = editora;
+            if(title) busca.title = { $regex: title, $options: "i"};
+            if(maxPag) busca.numPag = { ...busca.numPag, $lte: maxPag};
+            if(minPag) busca.numPag = { ...busca.numPag, $gte: minPag};
+            if(nomeAutor) {
+                const autor = await autores.findOne({ nome: nomeAutor});
+
+                if (autor != null ){
+                    busca.autor = autor._id;
+                } else {
+                    busca = null;
+                }
+            }
             const livrosResultados = await livros.find(busca).populate("autor");
-            res.status(200).json(livrosResultados);
+
+            if(busca != null)
+                res.status(200).json(livrosResultados);
+            else
+                res.status(200).send([]);
         }catch(err) {
             next(err);
         }
